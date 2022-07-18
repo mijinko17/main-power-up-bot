@@ -5,6 +5,7 @@ use handler::Handler;
 use serde::{Deserialize, Serialize};
 use serenity::prelude::*;
 
+pub mod commands;
 mod handler;
 
 #[tokio::main]

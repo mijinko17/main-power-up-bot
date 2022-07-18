@@ -1,10 +1,13 @@
 use serenity::async_trait;
 use serenity::model::gateway::Ready;
 use serenity::model::interactions::application_command::{
-    ApplicationCommand, ApplicationCommandOptionType,
+    ApplicationCommand, ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
 };
 use serenity::model::interactions::{Interaction, InteractionResponseType};
 use serenity::prelude::*;
+
+use crate::commands::main_power::command::main_power_up_response;
+use crate::commands::main_power::constants::MainWeaponType;
 
 pub struct Handler;
 
@@ -16,7 +19,26 @@ impl EventHandler for Handler {
 
             let content = match command.data.name.as_str() {
                 "takashi" => "†TAKASHI†".to_string(),
-                "main_power" => "hoge".to_string(),
+                "main_power" => {
+                    let options = command
+                        .data
+                        .options
+                        .get(0)
+                        .expect("error")
+                        .resolved
+                        .as_ref()
+                        .expect("error");
+                    if let ApplicationCommandInteractionDataOptionValue::String(str) = options {
+                        let main_weapon_type = MainWeaponType::from_str(str);
+                        if let Some(weapon) = main_weapon_type {
+                            main_power_up_response(weapon)
+                        } else {
+                            "ccc".to_string()
+                        }
+                    } else {
+                        "bbb".to_string()
+                    }
+                }
                 _ => command.data.name.clone(),
             };
 
@@ -58,7 +80,7 @@ impl EventHandler for Handler {
                             .kind(ApplicationCommandOptionType::String)
                             .required(true)
                             .add_string_choice("スプラチャージャー", "スプラチャージャー")
-                            .add_string_choice("zap", "zap")
+                            .add_string_choice("N-ZAP", "N-ZAP")
                     })
             })
             .await;
