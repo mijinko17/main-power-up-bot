@@ -1,6 +1,37 @@
+use serenity::{
+    client::Context,
+    model::interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},
+};
+
 use crate::commands::main_power::constants::MAIN_WEAPONS;
 
-use super::constants::MainWeaponType;
+use super::{
+    constants::{MAIN_POWER_UP_COMMAND_NAME, MAIN_WEAPON_NAME},
+    domain::MainWeaponType,
+};
+
+pub async fn register_main_power_up_command(
+    ctx: &Context,
+) -> Result<ApplicationCommand, serenity::Error> {
+    ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+        command
+            .name(MAIN_POWER_UP_COMMAND_NAME)
+            .description("メイン性能の効果を応答します.")
+            .create_option(|option| {
+                option
+                    .name("weapon")
+                    .description("メインウェポン")
+                    .kind(ApplicationCommandOptionType::String)
+                    .required(true)
+                    .add_string_choice(
+                        MAIN_WEAPON_NAME.splat_charger,
+                        MAIN_WEAPON_NAME.splat_charger,
+                    )
+                    .add_string_choice(MAIN_WEAPON_NAME.n_zap, MAIN_WEAPON_NAME.n_zap)
+            })
+    })
+    .await
+}
 
 pub fn main_power_up_response(main_weapon_type: MainWeaponType) -> String {
     let weapon = MAIN_WEAPONS

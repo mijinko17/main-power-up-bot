@@ -1,13 +1,16 @@
 use serenity::async_trait;
 use serenity::model::gateway::Ready;
 use serenity::model::interactions::application_command::{
-    ApplicationCommand, ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
+    ApplicationCommand, ApplicationCommandInteractionDataOptionValue,
 };
 use serenity::model::interactions::{Interaction, InteractionResponseType};
 use serenity::prelude::*;
 
-use crate::commands::main_power::command::main_power_up_response;
-use crate::commands::main_power::constants::MainWeaponType;
+use crate::commands::main_power::command::{
+    main_power_up_response, register_main_power_up_command,
+};
+use crate::commands::main_power::constants::MAIN_POWER_UP_COMMAND_NAME;
+use crate::commands::main_power::domain::MainWeaponType;
 
 pub struct Handler;
 
@@ -19,7 +22,7 @@ impl EventHandler for Handler {
 
             let content = match command.data.name.as_str() {
                 "takashi" => "†TAKASHI†".to_string(),
-                "main_power" => {
+                MAIN_POWER_UP_COMMAND_NAME => {
                     let options = command
                         .data
                         .options
@@ -68,22 +71,7 @@ impl EventHandler for Handler {
             takashi_command
         );
 
-        let main_power_up_command =
-            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
-                command
-                    .name("main_power")
-                    .description("メイン性能の効果を応答します.")
-                    .create_option(|option| {
-                        option
-                            .name("weapon")
-                            .description("メインウェポン")
-                            .kind(ApplicationCommandOptionType::String)
-                            .required(true)
-                            .add_string_choice("スプラチャージャー", "スプラチャージャー")
-                            .add_string_choice("N-ZAP", "N-ZAP")
-                    })
-            })
-            .await;
+        let main_power_up_command = register_main_power_up_command(&ctx).await;
         println!(
             "I created the following global slash command: {:#?}",
             main_power_up_command

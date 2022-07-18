@@ -1,62 +1,16 @@
-#[derive(Debug, PartialEq, Eq)]
-pub enum MainWeaponType {
-    SplooshOMatic,
-    SplattershotJr,
-    SplashOMatic,
-    Aerospray,
-    Splattershot,
-    _52Gal,
-    NZap,
-    SplatCharger,
-    // TODO: Add weapon.
+use super::domain::{MainPowerUpType, MainWeapon, MainWeaponType};
+
+pub const MAIN_POWER_UP_COMMAND_NAME: &str = "main_power";
+
+pub struct MainWeaponName {
+    pub n_zap: &'static str,
+    pub splat_charger: &'static str,
 }
 
-impl MainWeaponType {
-    pub fn from_str(arg: &str) -> Option<Self> {
-        match arg {
-            "N-ZAP" => Some(MainWeaponType::NZap),
-            "スプラチャージャー" => Some(MainWeaponType::SplatCharger),
-            _ => None,
-        }
-    }
-}
-
-impl ToString for MainWeaponType {
-    fn to_string(&self) -> String {
-        let result = match self {
-            Self::SplashOMatic => "ボールドマーカー",
-            Self::NZap => "N-ZAP",
-            Self::SplatCharger => "スプラチャージャー",
-            _ => "not implemented yet",
-        };
-        result.to_string()
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum MainPowerUpType {
-    PowerUp(Option<u32>),
-    Paint,
-    StandRecoil,
-}
-
-impl ToString for MainPowerUpType {
-    fn to_string(&self) -> String {
-        let result = match self {
-            Self::PowerUp(_) => "威力アップ",
-            Self::Paint => "塗り強化",
-            Self::StandRecoil => "立ち撃ち時のブレ軽減",
-            _ => "not implemented yet",
-        };
-        result.to_string()
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub struct MainWeapon {
-    pub main_weapon_type: MainWeaponType,
-    pub main_power_up_specs: &'static [MainPowerUpType],
-}
+pub const MAIN_WEAPON_NAME: MainWeaponName = MainWeaponName {
+    splat_charger: "スプラチャージャー",
+    n_zap: "N-ZAP",
+};
 
 pub const MAIN_WEAPONS: [MainWeapon; 3] = [
     MainWeapon {
