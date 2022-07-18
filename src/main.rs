@@ -1,11 +1,14 @@
 use std::fs::File;
 use std::io::BufReader;
 
+use handlers::slash_command::SlashCommandHandler;
 use serde::{Deserialize, Serialize};
 use serenity::async_trait;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
+
+mod handlers;
 
 struct Handler;
 
@@ -53,6 +56,7 @@ async fn main() {
     // by Discord for bot users.
     let mut client = Client::builder(&token, intents)
         .event_handler(Handler)
+        .event_handler(SlashCommandHandler)
         .await
         .expect("Err creating client");
 
