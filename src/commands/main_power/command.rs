@@ -40,6 +40,10 @@ pub async fn register_main_power_up_command(
                         MAIN_WEAPON_NAME.splash_o_matic,
                     )
                     .add_string_choice(MAIN_WEAPON_NAME.bamboozler14, MAIN_WEAPON_NAME.bamboozler14)
+                    .add_string_choice(
+                        MAIN_WEAPON_NAME.splattershot_jr,
+                        MAIN_WEAPON_NAME.splattershot_jr,
+                    )
             })
     })
     .await

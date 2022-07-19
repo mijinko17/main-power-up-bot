@@ -23,21 +23,8 @@ impl MainWeaponType {
             "スプラチャージャー" => Some(MainWeaponType::SplatCharger),
             "シャープマーカー" => Some(MainWeaponType::SplashOMatic),
             "14式竹筒銃" => Some(MainWeaponType::Bamboozler14),
+            "わかばシューター" => Some(MainWeaponType::SplattershotJr),
             _ => None,
-        }
-    }
-}
-
-impl TryFrom<&str> for MainWeaponType {
-    type Error = ();
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "N-ZAP" => Ok(MainWeaponType::NZap),
-            "スプラチャージャー" => Ok(MainWeaponType::SplatCharger),
-            "シャープマーカー" => Ok(MainWeaponType::SplashOMatic),
-            "14式竹筒銃" => Ok(MainWeaponType::Bamboozler14),
-            _ => Err(()),
         }
     }
 }
@@ -50,6 +37,7 @@ impl ToString for MainWeaponType {
             Self::SplatCharger => MAIN_WEAPON_NAME.splat_charger,
             Self::SplashOMatic => MAIN_WEAPON_NAME.splash_o_matic,
             Self::Bamboozler14 => MAIN_WEAPON_NAME.bamboozler14,
+            Self::SplattershotJr => MAIN_WEAPON_NAME.splattershot_jr,
             _ => "not implemented yet",
         };
         result.to_string()
