@@ -1,15 +1,13 @@
 use serenity::async_trait;
 use serenity::model::gateway::Ready;
-use serenity::model::interactions::application_command::{
-    ApplicationCommand, ApplicationCommandInteractionDataOptionValue,
-};
+use serenity::model::interactions::application_command::ApplicationCommand;
 use serenity::model::interactions::{Interaction, InteractionResponseType};
 use serenity::prelude::*;
-use serenity::utils::Colour;
 
-use crate::commands::main_power::command::{register_main_power_up_command, to_display_string};
+use crate::commands::main_power::command::{
+    interact_main_power_up_command, register_main_power_up_command,
+};
 use crate::commands::main_power::constants::MAIN_POWER_UP_COMMAND_NAME;
-use crate::commands::main_power::domain::{MainWeapon, MainWeaponType};
 
 pub struct Handler;
 
@@ -18,41 +16,33 @@ impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(command) = interaction {
             println!("Received command interaction: {:#?}", command);
-
-            let selected_weapon = match command.data.name.as_str() {
-                MAIN_POWER_UP_COMMAND_NAME => {
-                    let options = command
-                        .data
-                        .options
-                        .get(0)
-                        .expect("error")
-                        .resolved
-                        .as_ref()
-                        .expect("error");
-                    if let ApplicationCommandInteractionDataOptionValue::String(str) = options {
-                        MainWeaponType::from_str(str).map(MainWeapon::from)
-                    } else {
-                        None
+            match command.data.name.as_str() {
+                MAIN_POWER_UP_COMMAND_NAME => interact_main_power_up_command(&ctx, &command).await,
+                "takashi" => {
+                    if let Err(why) = command
+                        .create_interaction_response(&ctx.http, |response| {
+                            response
+                                .kind(InteractionResponseType::ChannelMessageWithSource)
+                                .interaction_response_data(|message| message.content("†TAKASHI†"))
+                        })
+                        .await
+                    {
+                        println!("Cannot respond to slash command: {}", why);
                     }
                 }
-                _ => None,
-            };
-            if let Some(weapon) = selected_weapon {
-                if let Err(why) = command
-                    .create_interaction_response(&ctx.http, |response| {
-                        response
-                            .kind(InteractionResponseType::ChannelMessageWithSource)
-                            .interaction_response_data(|message| {
-                                message.embed(|emb| {
-                                    emb.title(weapon.main_weapon_type.to_string())
-                                        .description(to_display_string(weapon))
-                                        .colour(Colour::MAGENTA)
+                _ => {
+                    if let Err(why) = command
+                        .create_interaction_response(&ctx.http, |response| {
+                            response
+                                .kind(InteractionResponseType::ChannelMessageWithSource)
+                                .interaction_response_data(|message| {
+                                    message.content("not implemented")
                                 })
-                            })
-                    })
-                    .await
-                {
-                    println!("Cannot respond to slash command: {}", why);
+                        })
+                        .await
+                    {
+                        println!("Cannot respond to slash command: {}", why);
+                    }
                 }
             }
         }

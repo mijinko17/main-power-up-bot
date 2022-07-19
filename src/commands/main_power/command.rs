@@ -1,7 +1,13 @@
 use itertools::Itertools;
 use serenity::{
     client::Context,
-    model::interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},
+    model::interactions::{
+        application_command::{
+            ApplicationCommand, ApplicationCommandInteraction,
+            ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
+        },
+        InteractionResponseType,
+    },
 };
 
 use crate::commands::main_power::constants::MAIN_WEAPONS;
@@ -62,4 +68,46 @@ pub fn to_display_string(main_weapon: MainWeapon) -> String {
         .map(|spec| spec.to_string())
         .map(|spec_str| format!("• {}", spec_str))
         .join("\n")
+}
+
+pub async fn interact_main_power_up_command(
+    ctx: &Context,
+    command: &ApplicationCommandInteraction,
+) {
+    let selected_weapon = match command.data.name.as_str() {
+        MAIN_POWER_UP_COMMAND_NAME => {
+            let options = command
+                .data
+                .options
+                .get(0)
+                .expect("error")
+                .resolved
+                .as_ref()
+                .expect("error");
+            if let ApplicationCommandInteractionDataOptionValue::String(str) = options {
+                MainWeaponType::from_str(str).map(MainWeapon::from)
+            } else {
+                None
+            }
+        }
+        _ => None,
+    };
+    if let Some(weapon) = selected_weapon {
+        if let Err(why) = command
+            .create_interaction_response(&ctx.http, |response| {
+                response
+                    .kind(InteractionResponseType::ChannelMessageWithSource)
+                    .interaction_response_data(|message| {
+                        message.embed(|emb| {
+                            emb.title(weapon.main_weapon_type.to_string())
+                                .description(to_display_string(weapon))
+                                .colour(serenity::utils::Colour::MAGENTA)
+                        })
+                    })
+            })
+            .await
+        {
+            println!("Cannot respond to slash command: {}", why);
+        }
+    }
 }
