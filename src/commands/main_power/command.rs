@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use serenity::{
     client::Context,
     model::interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},
@@ -7,7 +8,7 @@ use crate::commands::main_power::constants::MAIN_WEAPONS;
 
 use super::{
     constants::{MAIN_POWER_UP_COMMAND_NAME, MAIN_WEAPON_NAME},
-    domain::MainWeaponType,
+    domain::{MainWeapon, MainWeaponType},
 };
 
 pub async fn register_main_power_up_command(
@@ -28,6 +29,11 @@ pub async fn register_main_power_up_command(
                         MAIN_WEAPON_NAME.splat_charger,
                     )
                     .add_string_choice(MAIN_WEAPON_NAME.n_zap, MAIN_WEAPON_NAME.n_zap)
+                    .add_string_choice(
+                        MAIN_WEAPON_NAME.splash_o_matic,
+                        MAIN_WEAPON_NAME.splash_o_matic,
+                    )
+                    .add_string_choice(MAIN_WEAPON_NAME.bamboozler14, MAIN_WEAPON_NAME.bamboozler14)
             })
     })
     .await
@@ -47,4 +53,13 @@ pub fn main_power_up_response(main_weapon_type: MainWeaponType) -> String {
     } else {
         "not found".to_string()
     }
+}
+
+pub fn to_display_string(main_weapon: MainWeapon) -> String {
+    main_weapon
+        .main_power_up_specs
+        .iter()
+        .map(|spec| spec.to_string())
+        .map(|spec_str| format!("• {}", spec_str))
+        .join("\n")
 }
