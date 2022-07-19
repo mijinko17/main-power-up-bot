@@ -12,10 +12,16 @@ description = "Build"
 
 [tasks.run_container]
 category = "develop"
-dependencies = ["build"]
+dependencies = ["build_container"]
 description = "Run bot in container."
 script = ['''
 docker rm -f mpubot
-docker build -t main-power-up-bot .
 docker run -d --name mpubot main-power-up-bot
+''']
+
+[tasks.build_container]
+category = "develop"
+description = "Build docker image."
+script = ['''
+docker build -t main-power-up-bot .
 ''']
