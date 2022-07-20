@@ -64,12 +64,14 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+
     - name: Replace token in config.json with the correct value.
       uses: microsoft/variable-substitution@v1
       with:
         files: 'config.json'
       env:
         token: ${{ secrets.DISCORD_TOKEN }}
+
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
