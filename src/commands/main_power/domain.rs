@@ -19,6 +19,7 @@ pub enum MainWeaponType {
 impl MainWeaponType {
     pub fn from_str(value: &str) -> Option<Self> {
         match value {
+            "ボールドマーカー" => Some(MainWeaponType::SplooshOMatic),
             "N-ZAP" => Some(MainWeaponType::NZap),
             "スプラチャージャー" => Some(MainWeaponType::SplatCharger),
             "シャープマーカー" => Some(MainWeaponType::SplashOMatic),
@@ -32,7 +33,7 @@ impl MainWeaponType {
 impl ToString for MainWeaponType {
     fn to_string(&self) -> String {
         let result = match self {
-            Self::SplooshOMatic => "ボールドマーカー",
+            Self::SplooshOMatic => MAIN_WEAPON_NAME.sploosh_o_matic,
             Self::NZap => MAIN_WEAPON_NAME.n_zap,
             Self::SplatCharger => MAIN_WEAPON_NAME.splat_charger,
             Self::SplashOMatic => MAIN_WEAPON_NAME.splash_o_matic,

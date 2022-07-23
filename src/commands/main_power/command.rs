@@ -31,6 +31,10 @@ pub async fn register_main_power_up_command(
                     .kind(ApplicationCommandOptionType::String)
                     .required(true)
                     .add_string_choice(
+                        MAIN_WEAPON_NAME.sploosh_o_matic,
+                        MAIN_WEAPON_NAME.sploosh_o_matic,
+                    )
+                    .add_string_choice(
                         MAIN_WEAPON_NAME.splat_charger,
                         MAIN_WEAPON_NAME.splat_charger,
                     )
