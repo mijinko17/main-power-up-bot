@@ -439,6 +439,7 @@ name = "main-power-up-bot"
 version = "0.1.0"
 dependencies = [
  "itertools",
+ "once_cell",
  "serde",
  "serde_json",
  "serenity",

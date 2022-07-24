@@ -1,57 +1,59 @@
 use itertools::Itertools;
 use serenity::{
+    async_trait,
+    builder::CreateApplicationCommand,
     client::Context,
     model::interactions::{
         application_command::{
             ApplicationCommand, ApplicationCommandInteraction,
             ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
         },
-        InteractionResponseType,
+        Interaction, InteractionResponseType,
     },
 };
 
-use crate::commands::main_power::constants::MAIN_WEAPONS;
+use crate::{commands::main_power::constants::MAIN_WEAPONS, handler::SlashCommand};
 
 use super::{
     constants::{MAIN_POWER_UP_COMMAND_NAME, MAIN_WEAPON_NAME},
     domain::{MainWeapon, MainWeaponType},
 };
 
-pub async fn register_main_power_up_command(
-    ctx: &Context,
-) -> Result<ApplicationCommand, serenity::Error> {
-    ApplicationCommand::create_global_application_command(&ctx.http, |command| {
-        command
-            .name(MAIN_POWER_UP_COMMAND_NAME)
-            .description("メイン性能の効果を応答します.")
-            .create_option(|option| {
-                option
-                    .name("weapon")
-                    .description("メインウェポン")
-                    .kind(ApplicationCommandOptionType::String)
-                    .required(true)
-                    .add_string_choice(
-                        MAIN_WEAPON_NAME.sploosh_o_matic,
-                        MAIN_WEAPON_NAME.sploosh_o_matic,
-                    )
-                    .add_string_choice(
-                        MAIN_WEAPON_NAME.splat_charger,
-                        MAIN_WEAPON_NAME.splat_charger,
-                    )
-                    .add_string_choice(MAIN_WEAPON_NAME.n_zap, MAIN_WEAPON_NAME.n_zap)
-                    .add_string_choice(
-                        MAIN_WEAPON_NAME.splash_o_matic,
-                        MAIN_WEAPON_NAME.splash_o_matic,
-                    )
-                    .add_string_choice(MAIN_WEAPON_NAME.bamboozler14, MAIN_WEAPON_NAME.bamboozler14)
-                    .add_string_choice(
-                        MAIN_WEAPON_NAME.splattershot_jr,
-                        MAIN_WEAPON_NAME.splattershot_jr,
-                    )
-            })
-    })
-    .await
-}
+// pub async fn register_main_power_up_command(
+//     ctx: &Context,
+// ) -> Result<ApplicationCommand, serenity::Error> {
+//     ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+//         command
+//             .name(MAIN_POWER_UP_COMMAND_NAME)
+//             .description("メイン性能の効果を応答します.")
+//             .create_option(|option| {
+//                 option
+//                     .name("weapon")
+//                     .description("メインウェポン")
+//                     .kind(ApplicationCommandOptionType::String)
+//                     .required(true)
+//                     .add_string_choice(
+//                         MAIN_WEAPON_NAME.sploosh_o_matic,
+//                         MAIN_WEAPON_NAME.sploosh_o_matic,
+//                     )
+//                     .add_string_choice(
+//                         MAIN_WEAPON_NAME.splat_charger,
+//                         MAIN_WEAPON_NAME.splat_charger,
+//                     )
+//                     .add_string_choice(MAIN_WEAPON_NAME.n_zap, MAIN_WEAPON_NAME.n_zap)
+//                     .add_string_choice(
+//                         MAIN_WEAPON_NAME.splash_o_matic,
+//                         MAIN_WEAPON_NAME.splash_o_matic,
+//                     )
+//                     .add_string_choice(MAIN_WEAPON_NAME.bamboozler14, MAIN_WEAPON_NAME.bamboozler14)
+//                     .add_string_choice(
+//                         MAIN_WEAPON_NAME.splattershot_jr,
+//                         MAIN_WEAPON_NAME.splattershot_jr,
+//                     )
+//             })
+//     })
+//     .await
+// }
 
 pub fn main_power_up_response(main_weapon_type: MainWeaponType) -> String {
     let weapon = MAIN_WEAPONS
@@ -78,12 +80,57 @@ pub fn to_display_string(main_weapon: MainWeapon) -> String {
         .join("\n")
 }
 
-pub async fn interact_main_power_up_command(
-    ctx: &Context,
-    command: &ApplicationCommandInteraction,
-) {
-    let selected_weapon = match command.data.name.as_str() {
-        MAIN_POWER_UP_COMMAND_NAME => {
+// pub async fn interact_main_power_up_command(
+//     ctx: &Context,
+//     command: &ApplicationCommandInteraction,
+// ) {
+//     let selected_weapon = match command.data.name.as_str() {
+//         MAIN_POWER_UP_COMMAND_NAME => {
+//             let options = command
+//                 .data
+//                 .options
+//                 .get(0)
+//                 .expect("error")
+//                 .resolved
+//                 .as_ref()
+//                 .expect("error");
+//             if let ApplicationCommandInteractionDataOptionValue::String(str) = options {
+//                 MainWeaponType::from_str(str).map(MainWeapon::from)
+//             } else {
+//                 None
+//             }
+//         }
+//         _ => None,
+//     };
+//     if let Some(weapon) = selected_weapon {
+//         if let Err(why) = command
+//             .create_interaction_response(&ctx.http, |response| {
+//                 response
+//                     .kind(InteractionResponseType::ChannelMessageWithSource)
+//                     .interaction_response_data(|message| {
+//                         message.embed(|emb| {
+//                             emb.title(weapon.main_weapon_type.to_string())
+//                                 .description(to_display_string(weapon))
+//                                 .colour(serenity::utils::Colour::BLITZ_BLUE)
+//                         })
+//                     })
+//             })
+//             .await
+//         {
+//             println!("Cannot respond to slash command: {}", why);
+//         }
+//     }
+// }
+
+pub struct MainPowerUp;
+
+#[async_trait]
+impl SlashCommand for MainPowerUp {
+    fn name(&self) -> &'static str {
+        "main_power"
+    }
+    async fn interact(&self, ctx: &Context, command: &ApplicationCommandInteraction) {
+        let selected_weapon = {
             let options = command
                 .data
                 .options
@@ -97,25 +144,56 @@ pub async fn interact_main_power_up_command(
             } else {
                 None
             }
-        }
-        _ => None,
-    };
-    if let Some(weapon) = selected_weapon {
-        if let Err(why) = command
-            .create_interaction_response(&ctx.http, |response| {
-                response
-                    .kind(InteractionResponseType::ChannelMessageWithSource)
-                    .interaction_response_data(|message| {
-                        message.embed(|emb| {
-                            emb.title(weapon.main_weapon_type.to_string())
-                                .description(to_display_string(weapon))
-                                .colour(serenity::utils::Colour::MAGENTA)
+        };
+        if let Some(weapon) = selected_weapon {
+            if let Err(why) = command
+                .create_interaction_response(&ctx.http, |response| {
+                    response
+                        .kind(InteractionResponseType::ChannelMessageWithSource)
+                        .interaction_response_data(|message| {
+                            message.embed(|emb| {
+                                emb.title(weapon.main_weapon_type.to_string())
+                                    .description(to_display_string(weapon))
+                                    .colour(serenity::utils::Colour::MAGENTA)
+                            })
                         })
-                    })
-            })
-            .await
-        {
-            println!("Cannot respond to slash command: {}", why);
+                })
+                .await
+            {
+                println!("Cannot respond to slash command: {}", why);
+            }
         }
+    }
+    fn register<'a>(
+        &self,
+        command: &'a mut CreateApplicationCommand,
+    ) -> &'a mut CreateApplicationCommand {
+        command
+            .description("メイン性能の効果を応答します.")
+            .create_option(|option| {
+                option
+                    .name("weapon")
+                    .description("メインウェポン")
+                    .kind(ApplicationCommandOptionType::String)
+                    .required(true)
+                    .add_string_choice(
+                        MAIN_WEAPON_NAME.sploosh_o_matic,
+                        MAIN_WEAPON_NAME.sploosh_o_matic,
+                    )
+                    .add_string_choice(
+                        MAIN_WEAPON_NAME.splat_charger,
+                        MAIN_WEAPON_NAME.splat_charger,
+                    )
+                    .add_string_choice(MAIN_WEAPON_NAME.n_zap, MAIN_WEAPON_NAME.n_zap)
+                    .add_string_choice(
+                        MAIN_WEAPON_NAME.splash_o_matic,
+                        MAIN_WEAPON_NAME.splash_o_matic,
+                    )
+                    .add_string_choice(MAIN_WEAPON_NAME.bamboozler14, MAIN_WEAPON_NAME.bamboozler14)
+                    .add_string_choice(
+                        MAIN_WEAPON_NAME.splattershot_jr,
+                        MAIN_WEAPON_NAME.splattershot_jr,
+                    )
+            })
     }
 }

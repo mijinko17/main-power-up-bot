@@ -1,12 +1,19 @@
-use std::fs::File;
 use std::io::BufReader;
+use std::{fs::File, vec};
 
-use handler::Handler;
+use handler::{Handler, SlashCommand, SlashCommandHandler};
+use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use serenity::prelude::*;
 
+use crate::commands::main_power::command::MainPowerUp;
 pub mod commands;
 mod handler;
+
+fn global() -> &'static Vec<Box<dyn SlashCommand + Send + Sync>> {
+    static INSTANCE: OnceCell<Vec<Box<dyn SlashCommand + Send + Sync>>> = OnceCell::new();
+    INSTANCE.get_or_init(|| vec![Box::new(MainPowerUp)])
+}
 
 #[tokio::main]
 async fn main() {
@@ -19,7 +26,7 @@ async fn main() {
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
     let mut client = Client::builder(&token, intents)
-        .event_handler(Handler)
+        .event_handler(SlashCommandHandler { commands: global() })
         .await
         .expect("Err creating client");
 
