@@ -32,7 +32,6 @@ impl EventHandler for SlashCommandHandler {
                 slash_command.register(command.name(slash_command.name()))
             })
             .await;
-            println!("{}", slash_command.name());
             println!("I created the following global slash command: {:#?}", cmd);
         }
     }
@@ -51,9 +50,7 @@ pub trait SlashCommandBase {
     fn register<'a>(
         &self,
         command: &'a mut CreateApplicationCommand,
-    ) -> &'a mut CreateApplicationCommand {
-        command
-    }
+    ) -> &'a mut CreateApplicationCommand;
 }
 
 #[async_trait]
@@ -63,9 +60,7 @@ pub trait SlashCommand {
     fn register<'a>(
         &self,
         command: &'a mut CreateApplicationCommand,
-    ) -> &'a mut CreateApplicationCommand {
-        command
-    }
+    ) -> &'a mut CreateApplicationCommand;
 }
 
 #[async_trait]
@@ -90,5 +85,11 @@ where
         } else {
             println!("Invalid input.");
         }
+    }
+    fn register<'a>(
+        &self,
+        command: &'a mut CreateApplicationCommand,
+    ) -> &'a mut CreateApplicationCommand {
+        self.register(command)
     }
 }
