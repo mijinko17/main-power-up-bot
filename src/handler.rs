@@ -39,12 +39,12 @@ impl EventHandler for SlashCommandHandler {
 
 #[async_trait]
 pub trait SlashCommandBase {
-    type Value;
+    type Input;
     fn name(&self) -> &'static str;
-    fn extract(&self, command: &ApplicationCommandInteraction) -> Option<Self::Value>;
+    fn extract(&self, command: &ApplicationCommandInteraction) -> Option<Self::Input>;
     fn interaction<'a, 'b>(
         &self,
-        value: Self::Value,
+        value: Self::Input,
         response: &'a mut CreateInteractionResponse<'b>,
     ) -> &'a mut CreateInteractionResponse<'b>;
     fn register<'a>(
@@ -66,7 +66,7 @@ pub trait SlashCommand {
 #[async_trait]
 impl<U, T> SlashCommand for U
 where
-    U: SlashCommandBase<Value = T> + Send + Sync,
+    U: SlashCommandBase<Input = T> + Send + Sync,
     T: Send + Sync,
 {
     fn name(&self) -> &'static str {

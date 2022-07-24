@@ -20,7 +20,7 @@ use super::{
 pub struct MainPowerUp;
 
 impl SlashCommandBase for MainPowerUp {
-    type Value = MainWeapon;
+    type Input = MainWeapon;
 
     fn name(&self) -> &'static str {
         MAIN_POWER_UP_COMMAND_NAME
