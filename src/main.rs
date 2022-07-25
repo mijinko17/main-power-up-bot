@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use serenity::prelude::*;
 
 use crate::commands::main_power::command::MainPowerUp;
+use crate::commands::schedule::command::Schedule;
 use crate::commands::takashi::command::Takashi;
 
 pub mod commands;
@@ -14,7 +15,7 @@ mod handler;
 
 fn slash_commands() -> &'static Vec<Box<dyn SlashCommand + Send + Sync>> {
     static INSTANCE: OnceCell<Vec<Box<dyn SlashCommand + Send + Sync>>> = OnceCell::new();
-    INSTANCE.get_or_init(|| vec![Box::new(MainPowerUp), Box::new(Takashi)])
+    INSTANCE.get_or_init(|| vec![Box::new(MainPowerUp), Box::new(Schedule), Box::new(Takashi)])
 }
 
 #[tokio::main]
