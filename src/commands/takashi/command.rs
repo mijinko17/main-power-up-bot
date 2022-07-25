@@ -1,4 +1,5 @@
 use serenity::{
+    async_trait,
     builder::{CreateApplicationCommand, CreateInteractionResponse},
     model::interactions::{
         application_command::ApplicationCommandInteraction, InteractionResponseType,
@@ -9,14 +10,20 @@ use crate::handler::SlashCommandBase;
 
 pub struct Takashi;
 
+#[async_trait]
 impl SlashCommandBase for Takashi {
     type Input = ();
+    type Item = ();
 
     fn name(&self) -> &'static str {
         "takashi"
     }
 
     fn extract(&self, _: &ApplicationCommandInteraction) -> Option<Self::Input> {
+        Some(())
+    }
+
+    async fn convert(&self, _: Self::Input) -> Option<Self::Item> {
         Some(())
     }
 

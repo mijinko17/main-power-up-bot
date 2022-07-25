@@ -40,11 +40,13 @@ impl EventHandler for SlashCommandHandler {
 #[async_trait]
 pub trait SlashCommandBase {
     type Input;
+    type Item;
     fn name(&self) -> &'static str;
     fn extract(&self, command: &ApplicationCommandInteraction) -> Option<Self::Input>;
+    async fn convert(&self, input: Self::Input) -> Option<Self::Item>;
     fn interaction<'a, 'b>(
         &self,
-        value: Self::Input,
+        value: Self::Item,
         response: &'a mut CreateInteractionResponse<'b>,
     ) -> &'a mut CreateInteractionResponse<'b>;
     fn register<'a>(
@@ -64,23 +66,26 @@ pub trait SlashCommand {
 }
 
 #[async_trait]
-impl<U, T> SlashCommand for U
+impl<T, INPUT, ITEM> SlashCommand for T
 where
-    U: SlashCommandBase<Input = T> + Send + Sync,
-    T: Send + Sync,
+    T: SlashCommandBase<Input = INPUT, Item = ITEM> + Send + Sync,
+    INPUT: Send + Sync,
+    ITEM: Send + Sync,
 {
     fn name(&self) -> &'static str {
         self.name()
     }
     async fn interact(&self, ctx: &Context, command: &ApplicationCommandInteraction) {
         if let Some(value) = self.extract(command) {
-            if let Err(why) = command
-                .create_interaction_response(&ctx.http, |response| {
-                    self.interaction(value, response)
-                })
-                .await
-            {
-                println!("Cannot respond to slash command: {}", why);
+            if let Some(item) = self.convert(value).await {
+                if let Err(why) = command
+                    .create_interaction_response(&ctx.http, |response| {
+                        self.interaction(item, response)
+                    })
+                    .await
+                {
+                    println!("Cannot respond to slash command: {}", why);
+                }
             }
         } else {
             println!("Invalid input.");

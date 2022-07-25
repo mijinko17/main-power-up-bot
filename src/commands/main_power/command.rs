@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use serenity::{
+    async_trait,
     builder::{CreateApplicationCommand, CreateInteractionResponse},
     model::interactions::{
         application_command::{
@@ -19,14 +20,16 @@ use super::{
 
 pub struct MainPowerUp;
 
+#[async_trait]
 impl SlashCommandBase for MainPowerUp {
-    type Input = MainWeapon;
+    type Input = String;
+    type Item = MainWeapon;
 
     fn name(&self) -> &'static str {
         MAIN_POWER_UP_COMMAND_NAME
     }
 
-    fn extract(&self, command: &ApplicationCommandInteraction) -> Option<MainWeapon> {
+    fn extract(&self, command: &ApplicationCommandInteraction) -> Option<String> {
         let options = command
             .data
             .options
@@ -36,10 +39,14 @@ impl SlashCommandBase for MainPowerUp {
             .as_ref()
             .expect("error");
         if let ApplicationCommandInteractionDataOptionValue::String(str) = options {
-            MainWeaponType::from_str(str).map(MainWeapon::from)
+            Some(str.clone())
         } else {
             None
         }
+    }
+
+    async fn convert(&self, input: String) -> Option<MainWeapon> {
+        MainWeaponType::from_str(&input).map(MainWeapon::from)
     }
 
     fn interaction<'a, 'b>(
