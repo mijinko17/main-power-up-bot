@@ -6,6 +6,7 @@ use super::constants::{MAIN_WEAPONS, MAIN_WEAPON_NAME};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MainWeaponType {
+    // Shooter
     SplooshOMatic,
     SplattershotJr,
     SplashOMatic,
@@ -13,6 +14,13 @@ pub enum MainWeaponType {
     Splattershot,
     Dot52Gal,
     NZap,
+    SplattershotPro,
+    Dot96Gal,
+    JetSquelcher,
+    L3Nozzlenose,
+    H3Nozzlenose,
+    Squeezer,
+    // Charger
     SplatCharger,
     Bamboozler14,
     // TODO: Add weapon.
@@ -22,15 +30,11 @@ impl FromStr for MainWeaponType {
     type Err = ();
 
     fn from_str(value: &str) -> Result<MainWeaponType, Self::Err> {
-        match value {
-            "ボールドマーカー" => Ok(MainWeaponType::SplooshOMatic),
-            "N-ZAP" => Ok(MainWeaponType::NZap),
-            "スプラチャージャー" => Ok(MainWeaponType::SplatCharger),
-            "シャープマーカー" => Ok(MainWeaponType::SplashOMatic),
-            "14式竹筒銃" => Ok(MainWeaponType::Bamboozler14),
-            "わかばシューター" => Ok(MainWeaponType::SplattershotJr),
-            _ => Err(()),
-        }
+        MAIN_WEAPONS
+            .iter()
+            .map(|weapon| weapon.main_weapon_type.clone())
+            .find(|weapon_type| weapon_type.to_string().eq(&value))
+            .ok_or(())
     }
 }
 
@@ -38,12 +42,20 @@ impl ToString for MainWeaponType {
     fn to_string(&self) -> String {
         let result = match self {
             Self::SplooshOMatic => MAIN_WEAPON_NAME.sploosh_o_matic,
-            Self::NZap => MAIN_WEAPON_NAME.n_zap,
-            Self::SplatCharger => MAIN_WEAPON_NAME.splat_charger,
-            Self::SplashOMatic => MAIN_WEAPON_NAME.splash_o_matic,
-            Self::Bamboozler14 => MAIN_WEAPON_NAME.bamboozler14,
             Self::SplattershotJr => MAIN_WEAPON_NAME.splattershot_jr,
-            _ => "not implemented yet",
+            Self::SplashOMatic => MAIN_WEAPON_NAME.splash_o_matic,
+            Self::Aerospray => MAIN_WEAPON_NAME.aerospray,
+            Self::Splattershot => MAIN_WEAPON_NAME.splattershot,
+            Self::Dot52Gal => MAIN_WEAPON_NAME.dot_52_gal,
+            Self::NZap => MAIN_WEAPON_NAME.n_zap,
+            Self::SplattershotPro => MAIN_WEAPON_NAME.splattershot_pro,
+            Self::Dot96Gal => MAIN_WEAPON_NAME.dot_96_gal,
+            Self::JetSquelcher => MAIN_WEAPON_NAME.jet_squelcher,
+            Self::L3Nozzlenose => MAIN_WEAPON_NAME.l_3_nozzlenose,
+            Self::H3Nozzlenose => MAIN_WEAPON_NAME.h_3_nozzlenose,
+            Self::Squeezer => MAIN_WEAPON_NAME.squeezer,
+            Self::SplatCharger => MAIN_WEAPON_NAME.splat_charger,
+            Self::Bamboozler14 => MAIN_WEAPON_NAME.bamboozler14,
         };
         result.to_string()
     }
@@ -54,6 +66,9 @@ pub enum MainPowerUpType {
     PowerUp(Option<u32>),
     Paint,
     StandRecoil,
+    JumpRecoil,
+    ShootRange,
+    BulletSpeed,
 }
 
 impl ToString for MainPowerUpType {
@@ -90,7 +105,9 @@ impl ToString for MainPowerUpType {
             },
             Self::Paint => "塗り強化".to_string(),
             Self::StandRecoil => "立ち撃ち時のブレ軽減".to_string(),
-            _ => "not implemented yet".to_string(),
+            Self::JumpRecoil => "ジャンプ時のブレ軽減".to_string(),
+            Self::ShootRange => "射程延長".to_string(),
+            Self::BulletSpeed => "弾速アップ".to_string(),
         }
     }
 }
