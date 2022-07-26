@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use itertools::Itertools;
 
 use super::constants::{MAIN_WEAPONS, MAIN_WEAPON_NAME};
@@ -16,16 +18,18 @@ pub enum MainWeaponType {
     // TODO: Add weapon.
 }
 
-impl MainWeaponType {
-    pub fn from_str(value: &str) -> Option<Self> {
+impl FromStr for MainWeaponType {
+    type Err = ();
+
+    fn from_str(value: &str) -> Result<MainWeaponType, Self::Err> {
         match value {
-            "ボールドマーカー" => Some(MainWeaponType::SplooshOMatic),
-            "N-ZAP" => Some(MainWeaponType::NZap),
-            "スプラチャージャー" => Some(MainWeaponType::SplatCharger),
-            "シャープマーカー" => Some(MainWeaponType::SplashOMatic),
-            "14式竹筒銃" => Some(MainWeaponType::Bamboozler14),
-            "わかばシューター" => Some(MainWeaponType::SplattershotJr),
-            _ => None,
+            "ボールドマーカー" => Ok(MainWeaponType::SplooshOMatic),
+            "N-ZAP" => Ok(MainWeaponType::NZap),
+            "スプラチャージャー" => Ok(MainWeaponType::SplatCharger),
+            "シャープマーカー" => Ok(MainWeaponType::SplashOMatic),
+            "14式竹筒銃" => Ok(MainWeaponType::Bamboozler14),
+            "わかばシューター" => Ok(MainWeaponType::SplattershotJr),
+            _ => Err(()),
         }
     }
 }

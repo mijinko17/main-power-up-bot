@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use itertools::Itertools;
 use serenity::{
     async_trait,
@@ -46,7 +48,7 @@ impl SlashCommandBase for MainPowerUp {
     }
 
     async fn convert(&self, input: String) -> Option<MainWeapon> {
-        MainWeaponType::from_str(&input).map(MainWeapon::from)
+        MainWeaponType::from_str(&input).ok().map(MainWeapon::from)
     }
 
     fn interaction<'a, 'b>(
