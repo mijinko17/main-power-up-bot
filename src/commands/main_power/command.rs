@@ -16,7 +16,7 @@ use serenity::{
 use crate::handler::SlashCommandBase;
 
 use super::{
-    constants::{MAIN_POWER_UP_COMMAND_NAME, MAIN_WEAPON_NAME},
+    constants::{MAIN_POWER_UP_COMMAND_NAME, MAIN_WEAPONS},
     domain::{MainWeapon, MainWeaponType},
 };
 
@@ -74,28 +74,18 @@ impl SlashCommandBase for MainPowerUp {
         command
             .description("メイン性能の効果を応答します.")
             .create_option(|option| {
-                option
-                    .name("weapon")
-                    .description("メインウェポン")
-                    .kind(ApplicationCommandOptionType::String)
-                    .required(true)
-                    .add_string_choice(
-                        MAIN_WEAPON_NAME.sploosh_o_matic,
-                        MAIN_WEAPON_NAME.sploosh_o_matic,
-                    )
-                    .add_string_choice(
-                        MAIN_WEAPON_NAME.splat_charger,
-                        MAIN_WEAPON_NAME.splat_charger,
-                    )
-                    .add_string_choice(MAIN_WEAPON_NAME.n_zap, MAIN_WEAPON_NAME.n_zap)
-                    .add_string_choice(
-                        MAIN_WEAPON_NAME.splash_o_matic,
-                        MAIN_WEAPON_NAME.splash_o_matic,
-                    )
-                    .add_string_choice(MAIN_WEAPON_NAME.bamboozler14, MAIN_WEAPON_NAME.bamboozler14)
-                    .add_string_choice(
-                        MAIN_WEAPON_NAME.splattershot_jr,
-                        MAIN_WEAPON_NAME.splattershot_jr,
+                MAIN_WEAPONS
+                    .iter()
+                    .map(|weapon| weapon.main_weapon_type.to_string())
+                    .fold(
+                        option
+                            .name("weapon")
+                            .description("メインウェポン")
+                            .kind(ApplicationCommandOptionType::String)
+                            .required(true),
+                        |option_accumulated, weapon_name| {
+                            option_accumulated.add_string_choice(weapon_name.clone(), weapon_name)
+                        },
                     )
             })
     }
