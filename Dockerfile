@@ -14,6 +14,8 @@ COPY . .
 RUN cargo build --release
 
 FROM debian:11-slim
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends ca-certificates
 
 COPY --from=builder /app/target/release/main-power-up-bot .
 COPY ./config.json .
