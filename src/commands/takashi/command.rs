@@ -4,6 +4,7 @@ use serenity::{
     model::interactions::{
         application_command::ApplicationCommandInteraction, InteractionResponseType,
     },
+    prelude::Context,
 };
 
 use crate::handler::SlashCommandBase;
@@ -19,7 +20,7 @@ impl SlashCommandBase for Takashi {
         "takashi"
     }
 
-    fn extract(&self, _: &ApplicationCommandInteraction) -> Option<Self::Input> {
+    fn extract(&self, _: &Context, _: &ApplicationCommandInteraction) -> Option<Self::Input> {
         Some(())
     }
 

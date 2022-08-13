@@ -42,13 +42,29 @@ pub trait SlashCommandBase {
     type Input;
     type Item;
     fn name(&self) -> &'static str;
-    fn extract(&self, command: &ApplicationCommandInteraction) -> Option<Self::Input>;
+    fn extract(
+        &self,
+        ctx: &Context,
+        command: &ApplicationCommandInteraction,
+    ) -> Option<Self::Input>;
+    fn extract_failed_response<'a, 'b>(
+        &self,
+        response: &'a mut CreateInteractionResponse<'b>,
+    ) -> &'a mut CreateInteractionResponse<'b> {
+        response
+    }
     async fn convert(&self, input: Self::Input) -> Option<Self::Item>;
     fn interaction<'a, 'b>(
         &self,
         value: Self::Item,
         response: &'a mut CreateInteractionResponse<'b>,
     ) -> &'a mut CreateInteractionResponse<'b>;
+    fn convert_failed_response<'a, 'b>(
+        &self,
+        response: &'a mut CreateInteractionResponse<'b>,
+    ) -> &'a mut CreateInteractionResponse<'b> {
+        response
+    }
     fn register<'a>(
         &self,
         command: &'a mut CreateApplicationCommand,
@@ -76,7 +92,7 @@ where
         self.name()
     }
     async fn interact(&self, ctx: &Context, command: &ApplicationCommandInteraction) {
-        if let Some(value) = self.extract(command) {
+        if let Some(value) = self.extract(ctx, command) {
             if let Some(item) = self.convert(value).await {
                 if let Err(why) = command
                     .create_interaction_response(&ctx.http, |response| {
@@ -86,9 +102,21 @@ where
                 {
                     println!("Cannot respond to slash command: {}", why);
                 }
+            } else if let Err(why) = command
+                .create_interaction_response(&ctx.http, |response| {
+                    self.convert_failed_response(response)
+                })
+                .await
+            {
+                println!("Cannot respond to slash command: {}", why);
             }
-        } else {
-            println!("Invalid input.");
+        } else if let Err(why) = command
+            .create_interaction_response(&ctx.http, |response| {
+                self.extract_failed_response(response)
+            })
+            .await
+        {
+            println!("Cannot respond to slash command: {}", why);
         }
     }
     fn register<'a>(

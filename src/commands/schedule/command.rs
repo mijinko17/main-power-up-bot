@@ -6,6 +6,7 @@ use serenity::{
     model::interactions::{
         application_command::ApplicationCommandInteraction, InteractionResponseType,
     },
+    prelude::Context,
     utils::Colour,
 };
 
@@ -33,7 +34,7 @@ impl SlashCommandBase for Schedule {
         "schedule"
     }
 
-    fn extract(&self, _: &ApplicationCommandInteraction) -> Option<Self::Input> {
+    fn extract(&self, _: &Context, _: &ApplicationCommandInteraction) -> Option<Self::Input> {
         Some(())
     }
 

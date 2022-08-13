@@ -11,6 +11,7 @@ use serenity::{
         },
         InteractionResponseType,
     },
+    prelude::Context,
 };
 
 use crate::handler::SlashCommandBase;
@@ -31,7 +32,7 @@ impl SlashCommandBase for MainPowerUp {
         MAIN_POWER_UP_COMMAND_NAME
     }
 
-    fn extract(&self, command: &ApplicationCommandInteraction) -> Option<String> {
+    fn extract(&self, _: &Context, command: &ApplicationCommandInteraction) -> Option<String> {
         let options = command
             .data
             .options

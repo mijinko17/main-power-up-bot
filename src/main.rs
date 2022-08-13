@@ -6,6 +6,7 @@ use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use serenity::prelude::*;
 
+use crate::commands::buki_roulette::command::BukiRoulette;
 use crate::commands::main_power::command::MainPowerUp;
 use crate::commands::schedule::command::Schedule;
 use crate::commands::takashi::command::Takashi;
@@ -15,7 +16,14 @@ mod handler;
 
 fn slash_commands() -> &'static Vec<Box<dyn SlashCommand + Send + Sync>> {
     static INSTANCE: OnceCell<Vec<Box<dyn SlashCommand + Send + Sync>>> = OnceCell::new();
-    INSTANCE.get_or_init(|| vec![Box::new(MainPowerUp), Box::new(Schedule), Box::new(Takashi)])
+    INSTANCE.get_or_init(|| {
+        vec![
+            Box::new(MainPowerUp),
+            Box::new(Schedule),
+            Box::new(Takashi),
+            Box::new(BukiRoulette),
+        ]
+    })
 }
 
 #[tokio::main]
@@ -23,7 +31,8 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = get_token("config.json").expect("Err トークンが見つかりません");
     // Set gateway intents, which decides what events the bot will be notified about
-    let intents = GatewayIntents::empty();
+    // let intents = GatewayIntents::empty();
+    let intents = GatewayIntents::GUILDS | GatewayIntents::GUILD_VOICE_STATES;
 
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement
