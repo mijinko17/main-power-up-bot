@@ -53,7 +53,7 @@ impl SlashCommandBase for BukiRoulette {
             .voice_states
             .values()
             .filter(|voice_state| voice_state.channel_id.eq(&Some(channel_id)))
-            .map(|vs| vs.user_id)
+            .map(|voice_state| voice_state.user_id)
             .filter_map(|uid| guild.members.get(&uid))
             .map(|member| {
                 member

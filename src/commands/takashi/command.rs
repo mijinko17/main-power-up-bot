@@ -30,7 +30,7 @@ impl SlashCommandBase for Takashi {
 
     fn interaction<'a, 'b>(
         &self,
-        _: Self::Input,
+        _: Self::Item,
         response: &'a mut CreateInteractionResponse<'b>,
     ) -> &'a mut CreateInteractionResponse<'b> {
         response

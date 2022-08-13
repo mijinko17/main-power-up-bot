@@ -31,7 +31,6 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = get_token("config.json").expect("Err トークンが見つかりません");
     // Set gateway intents, which decides what events the bot will be notified about
-    // let intents = GatewayIntents::empty();
     let intents = GatewayIntents::GUILDS | GatewayIntents::GUILD_VOICE_STATES;
 
     // Create a new instance of the Client, logging in as a bot. This will
