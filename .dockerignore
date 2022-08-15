@@ -1,1 +1,8 @@
 target
+.aws
+.devcontainer
+.github
+.vscode
+.gitignore
+Makefile.toml
+rust-toolchain.toml
