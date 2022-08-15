@@ -45,6 +45,8 @@
 	// "postCreateCommand": "rustc --version",
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
+	// Run "cargo" to install toolchain specified in rust-toolchain.toml.
+	"postCreateCommand": "cargo",
 	"features": {
 		"docker-from-docker": "latest"
 	}
