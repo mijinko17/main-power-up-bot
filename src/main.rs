@@ -19,7 +19,7 @@ fn slash_commands() -> &'static Vec<Box<dyn SlashCommand + Send + Sync>> {
     INSTANCE.get_or_init(|| {
         vec![
             Box::new(MainPowerUp),
-            Box::new(Schedule),
+            Box::new(Schedule::default()),
             Box::new(Takashi),
             Box::new(BukiRoulette),
         ]

@@ -1,3 +1,8 @@
+use std::{
+    sync::Mutex,
+    time::{Duration, SystemTime},
+};
+
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serenity::{
@@ -10,23 +15,81 @@ use serenity::{
     utils::Colour,
 };
 
+static SCHEDULE_CACHE: Mutex<Option<Response>> = Mutex::new(None);
+
 use crate::handler::SlashCommandBase;
 
-pub struct Schedule;
+#[async_trait]
+pub trait ScheduleRepository {
+    async fn schedule(&self) -> Option<Response>;
+}
 
-#[derive(Debug, Serialize, Deserialize)]
+pub struct CachingScheduleRepository;
+
+#[async_trait]
+impl ScheduleRepository for CachingScheduleRepository {
+    async fn schedule(&self) -> Option<Response> {
+        let cache = SCHEDULE_CACHE.lock().unwrap().clone();
+        if let Some(c) = cache {
+            let now = SystemTime::now();
+            let next_schedule = SystemTime::UNIX_EPOCH
+                .checked_add(Duration::from_secs(c.result[0].end_t))
+                .unwrap();
+            if now < next_schedule {
+                println!("Use cache");
+                return Some(c);
+            }
+        }
+        let res = reqwest::Client::new()
+            .get("https://spla2.yuu26.com/gachi/now")
+            .header(
+                reqwest::header::USER_AGENT,
+                "main-power-up-bot/0.1 (twitter @mijinko_cpp)",
+            )
+            .send()
+            .await
+            .ok()?
+            .json::<Response>()
+            .await
+            .ok()?;
+        *SCHEDULE_CACHE.lock().unwrap() = Some(res.clone());
+        println!("Fetch");
+        Some(res)
+    }
+}
+
+pub struct Schedule<T>
+where
+    T: ScheduleRepository,
+{
+    repository: T,
+}
+
+impl Default for Schedule<CachingScheduleRepository> {
+    fn default() -> Self {
+        Self {
+            repository: CachingScheduleRepository,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Response {
     pub result: Vec<ScheduleResponse>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ScheduleResponse {
     pub rule: String,
     pub maps: Vec<String>,
+    pub end_t: u64,
 }
 
 #[async_trait]
-impl SlashCommandBase for Schedule {
+impl<T> SlashCommandBase for Schedule<T>
+where
+    T: ScheduleRepository + Send + Sync,
+{
     type Input = ();
     type Item = Response;
 
@@ -39,19 +102,7 @@ impl SlashCommandBase for Schedule {
     }
 
     async fn convert(&self, _: Self::Input) -> Option<Self::Item> {
-        let stage = reqwest::Client::new()
-            .get("https://spla2.yuu26.com/gachi/now")
-            .header(
-                reqwest::header::USER_AGENT,
-                "main-power-up-bot/0.1 (twitter @mijinko_cpp)",
-            )
-            .send()
-            .await
-            .ok()?
-            .json::<Response>()
-            .await
-            .ok()?;
-        Some(stage)
+        self.repository.schedule().await
     }
 
     fn interaction<'a, 'b>(
