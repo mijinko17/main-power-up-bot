@@ -1,7 +1,8 @@
 use std::fs::File;
 use std::io::BufReader;
 
-use handler::{SlashCommandContainer, SlashCommandHandler};
+use handler::slash_command::container::SlashCommandContainer;
+use handler::SlashCommandHandler;
 use serde::{Deserialize, Serialize};
 use serenity::prelude::*;
 

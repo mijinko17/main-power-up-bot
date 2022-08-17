@@ -14,7 +14,7 @@ use serenity::{
     prelude::Context,
 };
 
-use crate::handler::SlashCommandBase;
+use crate::handler::slash_command::SlashCommandBase;
 
 use super::{
     constants::{MAIN_POWER_UP_COMMAND_NAME, MAIN_WEAPONS},

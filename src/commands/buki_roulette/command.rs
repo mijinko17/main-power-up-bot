@@ -11,7 +11,7 @@ use serenity::{
     prelude::Context,
 };
 
-use crate::handler::SlashCommandBase;
+use crate::handler::slash_command::SlashCommandBase;
 
 use super::constants::WEAPONS;
 

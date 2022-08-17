@@ -15,9 +15,9 @@ use serenity::{
     utils::Colour,
 };
 
-static SCHEDULE_CACHE: Mutex<Option<Response>> = Mutex::new(None);
+use crate::handler::slash_command::SlashCommandBase;
 
-use crate::handler::SlashCommandBase;
+static SCHEDULE_CACHE: Mutex<Option<Response>> = Mutex::new(None);
 
 #[async_trait]
 pub trait ScheduleRepository {
