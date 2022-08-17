@@ -7,8 +7,33 @@ use serenity::model::interactions::application_command::{
 use serenity::model::interactions::Interaction;
 use serenity::prelude::*;
 
+#[derive(Default)]
+pub struct SlashCommandContainer {
+    pub commands: Vec<Box<dyn SlashCommand + Sync + Send>>,
+}
+
+impl SlashCommandContainer {
+    pub fn add_command<T: 'static + SlashCommand + Send + Sync>(mut self, command: T) -> Self {
+        self.commands.push(Box::new(command));
+        self
+    }
+    #[allow(clippy::borrowed_box)]
+    pub fn get(&self, name: &str) -> Option<&Box<dyn SlashCommand + Sync + Send>> {
+        self.commands.iter().find(|command| command.name().eq(name))
+    }
+    pub fn iter(&self) -> impl Iterator<Item = &Box<dyn SlashCommand + Sync + Send>> {
+        self.commands.iter()
+    }
+}
+
 pub struct SlashCommandHandler {
-    pub commands: &'static Vec<Box<dyn SlashCommand + Sync + Send>>,
+    container: SlashCommandContainer,
+}
+
+impl SlashCommandHandler {
+    pub fn new(container: SlashCommandContainer) -> Self {
+        Self { container }
+    }
 }
 
 #[async_trait]
@@ -16,23 +41,23 @@ impl EventHandler for SlashCommandHandler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(command) = interaction {
             println!("Received command interaction: {:#?}", command);
-            let received = command.data.name.as_str();
-            for slash_command in self.commands {
-                if slash_command.name().eq(received) {
-                    slash_command.interact(&ctx, &command).await;
-                    break;
-                }
+            if let Some(slash_command) = self.container.get(command.data.name.as_str()) {
+                slash_command.interact(&ctx, &command).await;
             }
         }
     }
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
-        for slash_command in self.commands {
-            let cmd = ApplicationCommand::create_global_application_command(&ctx.http, |command| {
-                slash_command.register(command.name(slash_command.name()))
-            })
-            .await;
-            println!("I created the following global slash command: {:#?}", cmd);
+        for slash_command in self.container.iter() {
+            let slash_command_result =
+                ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+                    slash_command.register(command.name(slash_command.name()))
+                })
+                .await;
+            println!(
+                "I created the following global slash command: {:#?}",
+                slash_command_result
+            );
         }
     }
 }
