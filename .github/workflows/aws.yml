@@ -27,7 +27,11 @@
 name: Deploy to Amazon ECS
 
 on:
-  workflow_call:
+  workflow_run:
+    workflows: ["CI"]
+    branches: ["main"]
+    types:
+      - completed
 
 env:
   AWS_REGION: ap-northeast-1 # set this to your preferred AWS region, e.g. us-west-1
@@ -49,8 +53,12 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
