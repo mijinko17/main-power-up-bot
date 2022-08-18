@@ -18,3 +18,47 @@ impl SlashCommandContainer {
         self.commands.iter()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use serenity::{
+        async_trait, builder::CreateApplicationCommand,
+        model::interactions::application_command::ApplicationCommandInteraction, prelude::Context,
+    };
+
+    #[derive(Debug)]
+    struct SlashCommandA;
+
+    #[async_trait]
+    impl SlashCommand for SlashCommandA {
+        fn name(&self) -> &'static str {
+            "a"
+        }
+        async fn interact(&self, _ctx: &Context, _command: &ApplicationCommandInteraction) {}
+        fn register<'a>(
+            &self,
+            command: &'a mut CreateApplicationCommand,
+        ) -> &'a mut CreateApplicationCommand {
+            command
+        }
+    }
+
+    #[test]
+    fn test_slash_command_container_add_command() {
+        let mut container = SlashCommandContainer { commands: vec![] };
+        assert!(container.commands.is_empty());
+        container = container.add_command(SlashCommandA);
+        assert_eq!(container.commands.len(), 1);
+    }
+
+    #[test]
+    fn test_slash_command_container_get() {
+        let container = SlashCommandContainer { commands: vec![] }.add_command(SlashCommandA);
+        let command_a = container.get("a").unwrap();
+        assert_eq!(command_a.name(), "a");
+        let no_command = container.get("b");
+        assert!(no_command.is_none());
+    }
+}
