@@ -1,7 +1,7 @@
 use serenity::{
     async_trait,
     builder::{CreateApplicationCommand, CreateInteractionResponse},
-    model::interactions::{
+    model::prelude::interaction::{
         application_command::ApplicationCommandInteraction, InteractionResponseType,
     },
     prelude::Context,

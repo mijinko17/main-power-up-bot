@@ -25,7 +25,8 @@ mod tests {
 
     use serenity::{
         async_trait, builder::CreateApplicationCommand,
-        model::interactions::application_command::ApplicationCommandInteraction, prelude::Context,
+        model::prelude::interaction::application_command::ApplicationCommandInteraction,
+        prelude::Context,
     };
 
     #[derive(Debug)]

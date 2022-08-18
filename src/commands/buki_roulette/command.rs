@@ -2,11 +2,11 @@ use rand::{seq::SliceRandom, thread_rng};
 use serenity::{
     async_trait,
     builder::{CreateApplicationCommand, CreateInteractionResponse},
-    model::{
-        interactions::{
+    model::prelude::{
+        interaction::{
             application_command::ApplicationCommandInteraction, InteractionResponseType,
         },
-        prelude::{ChannelId, Guild},
+        ChannelId, Guild,
     },
     prelude::Context,
 };

@@ -1,7 +1,7 @@
 use serenity::async_trait;
 use serenity::model::gateway::Ready;
-use serenity::model::interactions::Interaction;
-use serenity::model::prelude::application_command::ApplicationCommand;
+use serenity::model::prelude::command::Command;
+use serenity::model::prelude::interaction::Interaction;
 use serenity::prelude::*;
 
 use self::slash_command::container::SlashCommandContainer;
@@ -32,7 +32,7 @@ impl EventHandler for SlashCommandHandler {
         println!("{} is connected!", ready.user.name);
         for slash_command in self.container.iter() {
             let slash_command_result =
-                ApplicationCommand::create_global_application_command(&ctx.http, |command| {
+                Command::create_global_application_command(&ctx.http, |command| {
                     slash_command.register(command.name(slash_command.name()))
                 })
                 .await;

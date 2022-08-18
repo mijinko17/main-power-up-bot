@@ -1,6 +1,6 @@
 use serenity::async_trait;
 use serenity::builder::{CreateApplicationCommand, CreateInteractionResponse};
-use serenity::model::interactions::application_command::ApplicationCommandInteraction;
+use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
 use serenity::prelude::*;
 
 pub mod container;

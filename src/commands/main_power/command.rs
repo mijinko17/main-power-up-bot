@@ -4,12 +4,12 @@ use itertools::Itertools;
 use serenity::{
     async_trait,
     builder::{CreateApplicationCommand, CreateInteractionResponse},
-    model::interactions::{
-        application_command::{
-            ApplicationCommandInteraction, ApplicationCommandInteractionDataOptionValue,
-            ApplicationCommandOptionType,
+    model::prelude::{
+        command::CommandOptionType,
+        interaction::{
+            application_command::{ApplicationCommandInteraction, CommandDataOptionValue},
+            InteractionResponseType,
         },
-        InteractionResponseType,
     },
     prelude::Context,
 };
@@ -41,7 +41,7 @@ impl SlashCommandBase for MainPowerUp {
             .resolved
             .as_ref()
             .expect("error");
-        if let ApplicationCommandInteractionDataOptionValue::String(str) = options {
+        if let CommandDataOptionValue::String(str) = options {
             Some(str.clone())
         } else {
             None
@@ -82,7 +82,7 @@ impl SlashCommandBase for MainPowerUp {
                         option
                             .name("weapon")
                             .description("メインウェポン")
-                            .kind(ApplicationCommandOptionType::String)
+                            .kind(CommandOptionType::String)
                             .required(true),
                         |option_accumulated, weapon_name| {
                             option_accumulated.add_string_choice(weapon_name.clone(), weapon_name)
