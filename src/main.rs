@@ -6,10 +6,11 @@ use handler::SlashCommandHandler;
 use serde::{Deserialize, Serialize};
 use serenity::prelude::*;
 
-use crate::commands::buki_roulette::command::BukiRoulette;
-use crate::commands::main_power::command::MainPowerUp;
-use crate::commands::schedule::command::Schedule;
-use crate::commands::takashi::command::Takashi;
+use commands::buki_roulette::command::BukiRoulette;
+use commands::main_power::command::MainPowerUp;
+use commands::okite::command::Okite;
+use commands::schedule::command::Schedule;
+use commands::takashi::command::Takashi;
 
 pub mod commands;
 mod handler;
@@ -30,7 +31,8 @@ async fn main() {
                 .add_command(MainPowerUp)
                 .add_command(Schedule::default())
                 .add_command(Takashi)
-                .add_command(BukiRoulette),
+                .add_command(BukiRoulette)
+                .add_command(Okite),
         ))
         .await
         .expect("Err creating client");
